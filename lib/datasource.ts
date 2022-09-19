@@ -1,6 +1,8 @@
-import {DataSource} from "typeorm";
+import { DataSource } from "typeorm";
 // import typeorm from "typeorm";
-// import Wilder from "./../entity/Wilder";
+import Wilder from "../entity/Wilder";
+import Language from "../entity/Language";
+import Note from "../entity/Note";
 // import Language from "./../entity/Language";
 // import Note from "./../entity/Note";
 
@@ -15,6 +17,6 @@ export default new DataSource({
   database: path.resolve(__dirname, "../database.sqlite"),
   synchronize: true,
   // entities: [Wilder, Language, Note],
-  entities: [],
+  entities: [Wilder, Note, Language],
   logging: ["query", "error"],
 });
