@@ -1,6 +1,12 @@
+import { Repository } from "typeorm";
+import Language from "../entity/Language";
 import dataSource from "../lib/datasource";
 
-class LanguageController {
+interface ILanguageController {
+  db: Repository<Language>
+}
+class LanguageController implements ILanguageController {
+  db: Repository<Language>
   constructor() {
     this.db = dataSource.getRepository("Language");
   }

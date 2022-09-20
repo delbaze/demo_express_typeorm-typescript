@@ -28,11 +28,11 @@ router.get("/:id", async function (req, res) {
 router.post("/create", async function (req, res) {
   const { first_name, last_name, age } = req.body;
   try {
-    let wilder = await new WilderController().createWilder(
+    let wilder = await new WilderController().createWilder({
       first_name,
       last_name,
-      age
-    );
+      age,
+    });
     res.json({ success: true, wilder, message: "Le wilder a été ajouté" });
   } catch (err) {
     res.json({ success: false, message: err.message });

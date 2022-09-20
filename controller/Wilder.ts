@@ -1,29 +1,45 @@
+import { Repository } from "typeorm";
+import Wilder from "../entity/Wilder";
 import dataSource from "../lib/datasource";
-class WilderController {
+
+interface IWilderController {
+  db: Repository<Wilder>;
+  listWilders: () => Promise<Wilder[]>;
+  findWilder: (id: number) => Promise<Wilder | null>;
+  createWilder: ({ first_name, last_name, age }: IWilder) => Promise<Wilder>;
+}
+
+interface IWilder {
+  first_name: string;
+  last_name: string;
+  age?: number;
+}
+class WilderController implements IWilderController {
+  db: Repository<Wilder>;
   constructor() {
     this.db = dataSource.getRepository("Wilder");
   }
   async listWilders() {
     return await this.db //list des wilders avec notes
-    .createQueryBuilder('wilder')
-    .leftJoinAndSelect("wilder.notes", "note")
-    .leftJoinAndSelect("note.language", "language")
-    .getMany();
+      .createQueryBuilder("wilder")
+      .leftJoinAndSelect("wilder.notes", "note")
+      .leftJoinAndSelect("note.language", "language")
+      .getMany();
     // return await this.db.find(); //liste des wilders sans notes
   }
 
   //récupérer 1 wilder en particulier (à partir de son ID)
 
-  async findWilder(id) {
+  async findWilder(id: number): Promise<Wilder | null> {
     return await this.db
-      .createQueryBuilder('wilder')
+      .createQueryBuilder("wilder")
       .leftJoinAndSelect("wilder.notes", "note")
       .leftJoinAndSelect("note.language", "language")
       .where("wilder.id= :id", { id })
       .getOne();
   }
 
-  async createWilder(first_name, last_name, age) {
+  async createWilder({ first_name, last_name, age }: IWilder): Promise<Wilder> {
     //1 ere methode avec create
     let wilder = this.db.create({ first_name, last_name, age });
     return await this.db.save(wilder);
