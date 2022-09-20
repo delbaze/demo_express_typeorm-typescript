@@ -14,7 +14,7 @@ class LanguageController implements ILanguageController {
   async listLanguages() {
     return await this.db.find();
   }
-  async createLanguage(label) {
+  async createLanguage(label: string) {
     let language = this.db.create({ label });
     return await this.db.save(language);
 

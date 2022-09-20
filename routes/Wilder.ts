@@ -1,4 +1,5 @@
 import express, { Request, Response } from "express";
+import { IInfosReturn } from "../controller/interfaces";
 import WilderController from "./../controller/Wilder";
 const router = express.Router();
 
@@ -34,7 +35,7 @@ router.post("/create", async function (req, res) {
       age,
     });
     res.json({ success: true, wilder, message: "Le wilder a été ajouté" });
-  } catch (err) {
+  } catch (err: any) {
     res.json({ success: false, message: err.message });
   }
 });
@@ -57,17 +58,19 @@ router.patch("/update/:id", async function (req, res) {
 
 router.delete("/delete", async function (req, res) {
   const { id } = req.body;
+  let infos: IInfosReturn;
   try {
     let result = await new WilderController().deleteWilder(id);
 
     if (result.affected === 0) {
-      result = { success: false, message: "Le wilder n'existe pas" };
+      infos = { success: false, message: "Le wilder n'existe pas" };
     } else {
-      result = { success: true, message: "Wilder supprimé" };
+      infos = { success: true, message: "Wilder supprimé" };
     }
-    res.json(result);
-  } catch (err) {
-    res.json({ success: false, message: err.message });
+    res.json(infos);
+  } catch (err: any) {
+    infos = { success: false, message: err.message };
+    res.json(infos);
   }
 });
 

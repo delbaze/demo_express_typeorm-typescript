@@ -21,6 +21,12 @@ export interface IWilderAssignNote {
   wilderId: number;
   note: number;
 }
+
+
+export interface IInfosReturn {
+    success: boolean;
+    message: string;
+}
 export interface IWilderController extends IController {
   //   listWilders: () => Promise<Wilder[]>;
   //   findWilder: (id: number) => Promise<Wilder | null>;
