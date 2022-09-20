@@ -1,8 +1,8 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import WilderController from "./../controller/Wilder";
 const router = express.Router();
 
-router.get("/", async function (req, res) {
+router.get("/", async function (req: Request, res: Response) {
   try {
     let wilders = await new WilderController().listWilders();
     res.json({ wilders, success: true });
@@ -43,12 +43,12 @@ router.patch("/update/:id", async function (req, res) {
   const { id } = req.params;
   const { first_name, last_name, age } = req.body;
   try {
-    let wilder = await new WilderController().updateWilder(
+    let wilder = await new WilderController().updateWilder({
       first_name,
       last_name,
       age,
-      id
-    );
+      id,
+    });
     res.json({ wilder, success: true });
   } catch (err) {
     res.json({ success: false });
@@ -74,11 +74,11 @@ router.delete("/delete", async function (req, res) {
 router.post("/assignNoteLanguage", async function (req, res) {
   const { wilderId, languageId, note } = req.body;
   try {
-    let result = await new WilderController().assignNoteLanguage(
+    let result = await new WilderController().assignNoteLanguage({
       languageId,
       wilderId,
-      note
-    );
+      note,
+    });
     res.json({ result, success: true });
   } catch (err) {
     res.json({ success: false });

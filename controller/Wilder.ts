@@ -1,6 +1,7 @@
 import { Repository } from "typeorm";
 import Wilder from "../entity/Wilder";
 import dataSource from "../lib/datasource";
+<<<<<<< Updated upstream
 
 interface IWilderController {
   db: Repository<Wilder>;
@@ -14,6 +15,15 @@ interface IWilder {
   last_name: string;
   age?: number;
 }
+=======
+import {
+  IWilderAssignNote,
+  IWilderController,
+  IWilderInfos,
+  IWilderUpdateInfos,
+} from "./interfaces.d";
+
+>>>>>>> Stashed changes
 class WilderController implements IWilderController {
   db: Repository<Wilder>;
   constructor() {
@@ -30,7 +40,11 @@ class WilderController implements IWilderController {
 
   //récupérer 1 wilder en particulier (à partir de son ID)
 
+<<<<<<< Updated upstream
   async findWilder(id: number): Promise<Wilder | null> {
+=======
+  async findWilder(id: string | number) {
+>>>>>>> Stashed changes
     return await this.db
       .createQueryBuilder("wilder")
       .leftJoinAndSelect("wilder.notes", "note")
@@ -39,7 +53,11 @@ class WilderController implements IWilderController {
       .getOne();
   }
 
+<<<<<<< Updated upstream
   async createWilder({ first_name, last_name, age }: IWilder): Promise<Wilder> {
+=======
+  async createWilder({ first_name, last_name, age }: IWilderInfos) {
+>>>>>>> Stashed changes
     //1 ere methode avec create
     let wilder = this.db.create({ first_name, last_name, age });
     return await this.db.save(wilder);
@@ -55,7 +73,7 @@ class WilderController implements IWilderController {
     // return wilder;
   }
 
-  async updateWilder(first_name, last_name, age, id) {
+  async updateWilder({ first_name, last_name, age, id }: IWilderUpdateInfos) {
     return (
       this.db
         .createQueryBuilder()
@@ -67,7 +85,7 @@ class WilderController implements IWilderController {
     );
   }
 
-  async deleteWilder(id) {
+  async deleteWilder(id: number) {
     return this.db
       .createQueryBuilder()
       .delete()
@@ -75,7 +93,7 @@ class WilderController implements IWilderController {
       .execute();
   }
 
-  async assignNoteLanguage(languageId, wilderId, note) {
+  async assignNoteLanguage({ languageId, wilderId, note }: IWilderAssignNote) {
     let languageRepository = dataSource.getRepository("Language");
     let noteRepository = dataSource.getRepository("Note");
     let language = await languageRepository.findOneBy({ id: languageId });
