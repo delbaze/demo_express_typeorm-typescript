@@ -12,7 +12,6 @@ export interface IWilderInfos extends Wilder {
   notes?: Note[];
 }
 export interface IWilderUpdateInfos extends Wilder {
-  id: string;
   notes?: Note[];
 }
 

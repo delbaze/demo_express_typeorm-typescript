@@ -24,7 +24,7 @@ class WilderController implements IWilderController {
 
   //récupérer 1 wilder en particulier (à partir de son ID)
 
-  async findWilder(id: string | number) {
+  async findWilder(id: number) {
     return await this.db
       .createQueryBuilder("wilder")
       .leftJoinAndSelect("wilder.notes", "note")
