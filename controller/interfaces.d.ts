@@ -6,10 +6,9 @@ import { UpdateResult, DeleteResult } from "typeorm";
 export interface IController {
   db: Repository<Wilder | Language>;
 }
-
 export interface IWilderInfos extends Wilder {
   id?: number;
-  notes?: Note[];
+  notes?: IWilderAssignNote[];
 }
 export interface IWilderUpdateInfos extends Wilder {
   notes?: Note[];
@@ -19,6 +18,7 @@ export interface IWilderAssignNote {
   languageId: number;
   wilderId: number;
   note: number;
+  id?: number;
 }
 
 

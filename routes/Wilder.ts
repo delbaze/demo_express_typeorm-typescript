@@ -9,7 +9,6 @@ router.get("/", async function (_, res: Response) {
   try {
     let wilders = await new WilderController().listWilders();
 
-    ///
     res.json({ wilders, success: true });
   } catch (err) {
     res.json({ success: false });
@@ -31,12 +30,14 @@ router.get("/:id", async function (req: Request, res: Response) {
 });
 
 router.post("/create", async function (req: Request, res: Response) {
-  const { first_name, last_name, age } = req.body;
+  const { first_name, last_name, age, notes } = req.body;
+  console.log("🟩🟩🟩🟩🟩 ~ file: Wilder.ts ~ line 34 ~ req.body", req.body)
   try {
     let wilder: Wilder | null = await new WilderController().createWilder({
       first_name,
       last_name,
       age,
+      notes
     });
     res.json({ success: true, wilder, message: "Le wilder a été ajouté" });
   } catch (err: any) {

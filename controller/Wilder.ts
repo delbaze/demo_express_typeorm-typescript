@@ -1,4 +1,6 @@
 import { Repository } from "typeorm";
+import Language from "../entity/Language";
+import Note from "../entity/Note";
 import Wilder from "../entity/Wilder";
 import dataSource from "../lib/datasource";
 import {
@@ -33,10 +35,20 @@ class WilderController implements IWilderController {
       .getOne();
   }
 
-  async createWilder({ first_name, last_name, age }: IWilderInfos) {
+  async createWilder({ first_name, last_name, age, notes }: IWilderInfos) {
     //1 ere methode avec create
     let wilder = this.db.create({ first_name, last_name, age });
-    return await this.db.save(wilder);
+    let wilderSaved = await this.db.save(wilder);
+
+    notes?.forEach((n) => {
+      this.assignNoteLanguage({
+        languageId: n.languageId,
+        wilderId: wilderSaved.id,
+        note: n.note,
+      });
+    });
+    return wilderSaved;
+
 
     //2eme methode avec le query builder
 
