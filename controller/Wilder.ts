@@ -1,32 +1,53 @@
+import { Repository } from "typeorm";
+import Language from "../entity/Language";
+import Note from "../entity/Note";
+import Wilder from "../entity/Wilder";
 import dataSource from "../lib/datasource";
-class WilderController {
+import {
+  IWilderAssignNote,
+  IWilderController,
+  IWilderInfos,
+  IWilderUpdateInfos,
+} from "./interfaces.d";
+
+class WilderController implements IWilderController {
+  db: Repository<Wilder>;
   constructor() {
     this.db = dataSource.getRepository("Wilder");
   }
   async listWilders() {
     return await this.db //list des wilders avec notes
-    .createQueryBuilder('wilder')
-    .leftJoinAndSelect("wilder.notes", "note")
-    .leftJoinAndSelect("note.language", "language")
-    .getMany();
+      .createQueryBuilder("wilder")
+      .leftJoinAndSelect("wilder.notes", "note")
+      .leftJoinAndSelect("note.language", "language")
+      .getMany();
     // return await this.db.find(); //liste des wilders sans notes
   }
 
   //récupérer 1 wilder en particulier (à partir de son ID)
 
-  async findWilder(id) {
+  async findWilder(id: number) {
     return await this.db
-      .createQueryBuilder('wilder')
+      .createQueryBuilder("wilder")
       .leftJoinAndSelect("wilder.notes", "note")
       .leftJoinAndSelect("note.language", "language")
       .where("wilder.id= :id", { id })
       .getOne();
   }
 
-  async createWilder(first_name, last_name, age) {
+  async createWilder({ first_name, last_name, age, notes }: IWilderInfos) {
     //1 ere methode avec create
     let wilder = this.db.create({ first_name, last_name, age });
-    return await this.db.save(wilder);
+    let wilderSaved = await this.db.save(wilder);
+
+      notes?.forEach((n) => {
+        this.assignNoteLanguage({
+          languageId: n.language.id,
+          wilderId: wilderSaved.id,
+          note: n.note,
+        });
+      });
+    return wilderSaved;
 
     //2eme methode avec le query builder
 
@@ -39,19 +60,38 @@ class WilderController {
     // return wilder;
   }
 
-  async updateWilder(first_name, last_name, age, id) {
-    return (
-      this.db
-        .createQueryBuilder()
-        .update()
-        .set({ first_name, last_name, age })
-        // .where(`id=${id}`) // id=10
-        .where("id= :id", { id }) // id=10
-        .execute()
-    );
+  async updateWilder(params: IWilderUpdateInfos) {
+    const { notes, id, ...userInfo } = params;
+
+    let wilder = await this.findWilder(id); //me permet de récupérer mes notes
+    if (!wilder) {
+      throw new Error("Ce wilder n'existe pas");
+    }
+    let updatedWilder = await this.db.update(id, userInfo);
+    let noteRepository = dataSource.getRepository("Note");
+    if (notes?.length === 0) { //si jamais je n'ai plus de notes reçue depuis le formulaire, je supprime toutes les notes
+      wilder?.notes.forEach(async (note) => {
+        await noteRepository.delete(note.id);
+      });
+    }
+    notes?.forEach((n) => {
+      wilder?.notes.forEach(async (note) => {
+        if (notes.some((n) => n.id !== note.id)) { // si la note est présente dans le wilder, mais pas dans les notes reçues par le formulaire
+          await noteRepository.delete(note.id);
+        }
+      });
+      if (n.language?.id) {
+        this.assignNoteLanguage({
+          languageId: n.language.id,
+          wilderId: id,
+          note: n.note,
+        });
+      }
+    });
+    return updatedWilder;
   }
 
-  async deleteWilder(id) {
+  async deleteWilder(id: number) {
     return this.db
       .createQueryBuilder()
       .delete()
@@ -59,17 +99,21 @@ class WilderController {
       .execute();
   }
 
-  async assignNoteLanguage(languageId, wilderId, note) {
+  async assignNoteLanguage({ languageId, wilderId, note }: IWilderAssignNote) {
     let languageRepository = dataSource.getRepository("Language");
     let noteRepository = dataSource.getRepository("Note");
     let language = await languageRepository.findOneBy({ id: languageId });
-    if (!language) {
-      throw new Error("ce langage n'existe pas");
-    }
     let wilder = await this.db.findOneBy({ id: wilderId });
     if (!wilder) {
       throw new Error("ce wilder n'existe pas");
     }
+    if (!language) {
+      throw new Error("ce langage n'existe pas");
+    }
+    console.log(
+      "🟩🟩🟩🟩🟩 ~ file: Wilder.ts ~ line 105 ~ WilderController ~ assignNoteLanguage ~ language",
+      language
+    );
     let previousNote = await noteRepository.findOneBy({ wilder, language });
 
     let newNote = noteRepository.save({
