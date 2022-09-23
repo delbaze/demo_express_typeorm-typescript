@@ -31,7 +31,6 @@ router.get("/:id", async function (req: Request, res: Response) {
 
 router.post("/create", async function (req: Request, res: Response) {
   const { first_name, last_name, age, notes } = req.body;
-  console.log("🟩🟩🟩🟩🟩 ~ file: Wilder.ts ~ line 34 ~ req.body", req.body)
   try {
     let wilder: Wilder | null = await new WilderController().createWilder({
       first_name,
@@ -48,17 +47,21 @@ router.post("/create", async function (req: Request, res: Response) {
 router.patch("/update/:id", async function (req: Request, res: Response) {
   const { id } = req.params;
   
-  const { first_name, last_name, age } = req.body;
+  const { first_name, last_name, age, notes} = req.body;
+  console.log("🟩🟩🟩🟩🟩 ~ file: Wilder.ts ~ line 51 ~ first_name, last_name, age, notes", first_name, last_name, age, notes)
+  
   try {
     let wilder: UpdateResult = await new WilderController().updateWilder({
       first_name,
       last_name,
       age,
       id: +id,
+      notes
     });
     
     res.json({ wilder, success: true });
   } catch (err) {
+    console.log("🟩🟩🟩🟩🟩 ~ file: Wilder.ts ~ line 64 ~ err", err)
     res.json({ success: false });
   }
 });

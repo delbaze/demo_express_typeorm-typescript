@@ -40,13 +40,13 @@ class WilderController implements IWilderController {
     let wilder = this.db.create({ first_name, last_name, age });
     let wilderSaved = await this.db.save(wilder);
 
-    notes?.forEach((n) => {
-      this.assignNoteLanguage({
-        languageId: n.languageId,
-        wilderId: wilderSaved.id,
-        note: n.note,
+      notes?.forEach((n) => {
+        this.assignNoteLanguage({
+          languageId: n.language.id,
+          wilderId: wilderSaved.id,
+          note: n.note,
+        });
       });
-    });
     return wilderSaved;
 
     //2eme methode avec le query builder
@@ -60,16 +60,35 @@ class WilderController implements IWilderController {
     // return wilder;
   }
 
-  async updateWilder({ first_name, last_name, age, id }: IWilderUpdateInfos) {
-    return (
-      this.db
-        .createQueryBuilder()
-        .update()
-        .set({ first_name, last_name, age })
-        // .where(`id=${id}`) // id=10
-        .where("id= :id", { id }) // id=10
-        .execute()
-    );
+  async updateWilder(params: IWilderUpdateInfos) {
+    const { notes, id, ...userInfo } = params;
+
+    let wilder = await this.findWilder(id); //me permet de récupérer mes notes
+    if (!wilder) {
+      throw new Error("Ce wilder n'existe pas");
+    }
+    let updatedWilder = await this.db.update(id, userInfo);
+    let noteRepository = dataSource.getRepository("Note");
+    if (notes?.length === 0) { //si jamais je n'ai plus de notes reçue depuis le formulaire, je supprime toutes les notes
+      wilder?.notes.forEach(async (note) => {
+        await noteRepository.delete(note.id);
+      });
+    }
+    notes?.forEach((n) => {
+      wilder?.notes.forEach(async (note) => {
+        if (notes.some((n) => n.id !== note.id)) { // si la note est présente dans le wilder, mais pas dans les notes reçues par le formulaire
+          await noteRepository.delete(note.id);
+        }
+      });
+      if (n.language?.id) {
+        this.assignNoteLanguage({
+          languageId: n.language.id,
+          wilderId: id,
+          note: n.note,
+        });
+      }
+    });
+    return updatedWilder;
   }
 
   async deleteWilder(id: number) {
@@ -91,6 +110,10 @@ class WilderController implements IWilderController {
     if (!language) {
       throw new Error("ce langage n'existe pas");
     }
+    console.log(
+      "🟩🟩🟩🟩🟩 ~ file: Wilder.ts ~ line 105 ~ WilderController ~ assignNoteLanguage ~ language",
+      language
+    );
     let previousNote = await noteRepository.findOneBy({ wilder, language });
 
     let newNote = noteRepository.save({

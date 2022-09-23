@@ -8,7 +8,7 @@ export interface IController {
 }
 export interface IWilderInfos extends Wilder {
   id?: number;
-  notes?: IWilderAssignNote[];
+  notes?: IWilderInputNote[];
 }
 export interface IWilderUpdateInfos extends Wilder {
   notes?: Note[];
@@ -17,6 +17,11 @@ export interface IWilderUpdateInfos extends Wilder {
 export interface IWilderAssignNote {
   languageId: number;
   wilderId: number;
+  note: number;
+  id?: number;
+}
+export interface IWilderInputNote {
+  language: Language;
   note: number;
   id?: number;
 }
