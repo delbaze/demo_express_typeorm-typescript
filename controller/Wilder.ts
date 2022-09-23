@@ -7,6 +7,7 @@ import {
   IWilderAssignNote,
   IWilderController,
   IWilderInfos,
+  IWilderInputNote,
   IWilderUpdateInfos,
 } from "./interfaces.d";
 
@@ -40,7 +41,7 @@ class WilderController implements IWilderController {
     let wilder = this.db.create({ first_name, last_name, age });
     let wilderSaved = await this.db.save(wilder);
 
-      notes?.forEach((n) => {
+      notes?.forEach((n: IWilderInputNote) => {
         this.assignNoteLanguage({
           languageId: n.language.id,
           wilderId: wilderSaved.id,
@@ -74,8 +75,8 @@ class WilderController implements IWilderController {
         await noteRepository.delete(note.id);
       });
     }
-    notes?.forEach((n) => {
-      wilder?.notes.forEach(async (note) => {
+    notes?.forEach((n: Note) => {
+      wilder?.notes.forEach(async (note: Note) => {
         if (notes.some((n) => n.id !== note.id)) { // si la note est présente dans le wilder, mais pas dans les notes reçues par le formulaire
           await noteRepository.delete(note.id);
         }
