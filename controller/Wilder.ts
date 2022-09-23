@@ -49,7 +49,6 @@ class WilderController implements IWilderController {
     });
     return wilderSaved;
 
-
     //2eme methode avec le query builder
 
     // let wilder = this.db
@@ -85,12 +84,12 @@ class WilderController implements IWilderController {
     let languageRepository = dataSource.getRepository("Language");
     let noteRepository = dataSource.getRepository("Note");
     let language = await languageRepository.findOneBy({ id: languageId });
-    if (!language) {
-      throw new Error("ce langage n'existe pas");
-    }
     let wilder = await this.db.findOneBy({ id: wilderId });
     if (!wilder) {
       throw new Error("ce wilder n'existe pas");
+    }
+    if (!language) {
+      throw new Error("ce langage n'existe pas");
     }
     let previousNote = await noteRepository.findOneBy({ wilder, language });
 
