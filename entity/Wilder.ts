@@ -1,21 +1,27 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm"
-import Note from "./Note"
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
+import { ObjectType, Field } from "type-graphql";
+import Note from "./Note";
 
+@ObjectType()
 @Entity("wilders")
 export default class Wilder {
-    @PrimaryGeneratedColumn()
-    id: number
+  @Field()
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column()
-    first_name: string
+  @Field()
+  @Column()
+  first_name: string;
 
-    @Column()
-    last_name: string
+  @Field()
+  @Column()
+  last_name: string;
 
-    @Column()
-    age: number
-    
-    @OneToMany(() => Note, (note) => note.wilder , {})
-    notes: Note[]
+  @Field()
+  @Column()
+  age: number;
 
+  @Field(() => [Note], { nullable: true })
+  @OneToMany(() => Note, (note) => note.wilder, {})
+  notes: Note[];
 }

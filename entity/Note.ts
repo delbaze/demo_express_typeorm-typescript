@@ -6,21 +6,31 @@ import {
   JoinColumn,
 } from "typeorm";
 import Wilder from "./Wilder";
-import Language from "./Language";
 
+import Language from "./Language";
+import { ObjectType, Field } from "type-graphql";
+
+@ObjectType()
 @Entity("notes")
 export default class Note {
+  @Field()
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
+  @Field()
   note: number;
 
+  @Field()
   @ManyToOne("Language", { eager: true, onDelete: "CASCADE" })
   @JoinColumn()
   language: Language;
 
-  @ManyToOne(() => Wilder, (wilder) => wilder.notes, { eager: true, onDelete: "CASCADE" })
+  @Field(() => Wilder)
+  @ManyToOne(() => Wilder, (wilder) => wilder.notes, {
+    eager: true,
+    onDelete: "CASCADE",
+  })
   @JoinColumn()
   wilder: Wilder;
 }
