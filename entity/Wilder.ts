@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
-import { ObjectType, Field } from "type-graphql";
+import { ObjectType, Field, InputType } from "type-graphql";
 import Note from "./Note";
 
 @ObjectType()
@@ -25,3 +25,28 @@ export default class Wilder {
   @OneToMany(() => Note, (note) => note.wilder, {})
   notes: Note[];
 }
+
+@InputType({ description: "New recipe data" })
+export class CreateWilderInput implements Partial<Wilder> {
+  @Field()
+  first_name: string;
+
+  @Field({ nullable: true })
+  last_name: string;
+
+  @Field({ nullable: true })
+  age: number;
+}
+
+@ObjectType()
+export class WilderListData {
+  @Field()
+  success: boolean;
+
+  @Field(() => [Wilder])
+  wilders: Wilder[];
+
+  @Field({ nullable: true })
+  message: string;
+}
+
