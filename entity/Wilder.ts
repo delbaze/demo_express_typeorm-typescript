@@ -26,7 +26,7 @@ export default class Wilder {
   notes: Note[];
 }
 
-@InputType({ description: "New recipe data" })
+@InputType({ description: "New wilder data" })
 export class CreateWilderInput implements Partial<Wilder> {
   @Field()
   first_name: string;
